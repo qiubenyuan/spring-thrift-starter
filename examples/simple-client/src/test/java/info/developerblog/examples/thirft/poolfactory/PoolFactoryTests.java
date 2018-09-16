@@ -27,11 +27,15 @@ public class PoolFactoryTests {
     @Autowired
     private ThriftClientPool thriftClientsPool;
 
-    private final ThriftClientKey thriftClientKey = ThriftClientKey.builder()
-                                                                   .clazz(TGreetingService.Client.class)
-                                                                   .serviceName("greeting-service")
-                                                                   .path("/api")
-                                                                   .build();
+    private final ThriftClientKey thriftClientKey = createThriftClientKey("greeting-service");
+
+    private ThriftClientKey createThriftClientKey(String serviceName) {
+        ThriftClientKey keyObj = new ThriftClientKey();
+        keyObj.setClazz(TGreetingService.Client.class);
+        keyObj.setServiceName(serviceName);
+        keyObj.setPath("/api");
+        return keyObj;
+    }
 
     private KeyedPooledObjectFactory<ThriftClientKey, TServiceClient> factory;
 

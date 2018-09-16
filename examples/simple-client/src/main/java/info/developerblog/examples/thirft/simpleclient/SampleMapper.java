@@ -22,13 +22,19 @@ public class SampleMapper extends AbstractThriftClientKeyMapper {
         Map<String, String> mappingsAsStrings = new HashMap<>();
         mappingsAsStrings.put("key1", "greeting-service");
         mappingsAsStrings.put("key2", "greeting-service-with-timeouts");
-        mappingsAsStrings.forEach((key, value) -> mappings.put(key, ThriftClientKey.builder()
-                                                                                            .clazz(TGreetingService.Client.class)
-                                                                                            .serviceName(value)
-                                                                                            .path("/api")
-                                                                                            .build()));
+
+        mappingsAsStrings.forEach((key, value) -> mappings.put(key, createThriftClientKey(value)));
     }
 
+    private ThriftClientKey createThriftClientKey(String serviceName) {
+        ThriftClientKey keyObj = new ThriftClientKey();
+        keyObj.setClazz(TGreetingService.Client.class);
+        keyObj.setServiceName(serviceName);
+        keyObj.setPath("/api");
+        return keyObj;
+    }
+
+    @Override
     public HashMap<String, ThriftClientKey> getMappings() {
         return mappings;
     }

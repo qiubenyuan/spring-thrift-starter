@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-@RequiredArgsConstructor
 public class MetricsThriftMethodInterceptor implements MethodInterceptor {
 
     private final MeterRegistry meterRegistry;
+
+    public MetricsThriftMethodInterceptor(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {

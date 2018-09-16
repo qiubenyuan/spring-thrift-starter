@@ -1,9 +1,6 @@
 package ru.trylogic.spring.boot.thrift;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
@@ -11,6 +8,7 @@ import org.apache.thrift.server.TServlet;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -63,6 +61,7 @@ public class ThriftAutoConfiguration {
         @Autowired
         private LoggingThriftMethodInterceptor loggingThriftMethodInterceptor;
 
+        @Override
         public void configureProxyFactory(ProxyFactory proxyFactory) {
             proxyFactory.setOptimize(true);
 
@@ -76,8 +75,6 @@ public class ThriftAutoConfiguration {
     @Configuration
     public static class Registrar extends RegistrationBean implements ApplicationContextAware {
 
-        @Getter
-        @Setter
         private ApplicationContext applicationContext;
 
         @Autowired
@@ -92,12 +89,20 @@ public class ThriftAutoConfiguration {
         }
 
         @Override
-        @SneakyThrows({NoSuchMethodException.class, ClassNotFoundException.class, InstantiationException.class, IllegalAccessException.class})
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            this.applicationContext = applicationContext;
+        }
+
+        @Override
+//        @SneakyThrows({NoSuchMethodException.class, ClassNotFoundException.class, InstantiationException.class, IllegalAccessException.class})
         protected void register(String description, ServletContext servletContext) {
             for (String beanName : applicationContext.getBeanNamesForAnnotation(ThriftController.class)) {
                 ThriftController annotation = applicationContext.findAnnotationOnBean(beanName, ThriftController.class);
 
-                register(servletContext, annotation.value(), protocolFactory.getClass(), applicationContext.getBean(beanName));
+                try {
+                    register(servletContext, annotation.value(), protocolFactory.getClass(), applicationContext.getBean(beanName));
+                } catch (Exception ignored) {
+                }
             }
         }
 

@@ -2,10 +2,6 @@ package info.developerblog.spring.thrift.client;
 
 import info.developerblog.spring.thrift.annotation.ThriftClientsMap;
 import info.developerblog.spring.thrift.client.pool.ThriftClientKey;
-import java.lang.reflect.Field;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.commons.pool2.KeyedObjectPool;
@@ -25,14 +21,18 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author jihor (jihor@ya.ru)
- * Created on 2016-06-14
+ *         Created on 2016-06-14
  */
 
 @Component
@@ -75,7 +75,7 @@ public class ThriftClientsMapBeanPostProcessor implements BeanPostProcessor {
 
                 if (null != annotation) {
                     HashMap clients = new HashMap();
-                    for (Map.Entry<String, ThriftClientKey> entry : ((AbstractThriftClientKeyMapper)beanFactory.getBean(annotation.mapperClass())).getMappings().entrySet()) {
+                    for (Map.Entry<String, ThriftClientKey> entry : ((AbstractThriftClientKeyMapper) beanFactory.getBean(annotation.mapperClass())).getMappings().entrySet()) {
                         ProxyFactory proxyFactory = getProxyFactoryForThriftClient(bean, field, entry.getValue().getClazz());
                         addPoolAdvice(proxyFactory, entry.getValue());
 
@@ -92,11 +92,14 @@ public class ThriftClientsMapBeanPostProcessor implements BeanPostProcessor {
     }
 
     //We have to get a real bean in order to inject a thrift client into the bean instead of its proxy.
-    @SneakyThrows
     private Object getTargetBean(Object bean) {
         Object target = bean;
         while (AopUtils.isAopProxy(target)) {
-            target = ((Advised)target).getTargetSource().getTarget();
+            try {
+                target = ((Advised) target).getTargetSource().getTarget();
+            } catch (Exception ignored) {
+
+            }
         }
         return target;
     }

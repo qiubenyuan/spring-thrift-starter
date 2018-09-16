@@ -2,13 +2,14 @@ package info.developerblog.spring.thrift.client;
 
 import info.developerblog.spring.thrift.annotation.ThriftClient;
 import info.developerblog.spring.thrift.client.pool.ThriftClientKey;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.SneakyThrows;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.apache.thrift.TException;
@@ -102,11 +103,14 @@ public class ThriftClientBeanPostProcessor implements org.springframework.beans.
     }
 
     //We have to get a real bean in order to inject a thrift client into the bean instead of its proxy.
-    @SneakyThrows
     private Object getTargetBean(Object bean) {
         Object target = bean;
         while (AopUtils.isAopProxy(target)) {
-            target = ((Advised)target).getTargetSource().getTarget();
+            try {
+                target = ((Advised) target).getTargetSource().getTarget();
+            } catch (Exception ignored) {
+
+            }
         }
         return target;
     }
@@ -135,22 +139,23 @@ public class ThriftClientBeanPostProcessor implements org.springframework.beans.
 
             TServiceClient thriftClient = null;
 
-            ThriftClientKey key = ThriftClientKey.builder()
-                    .clazz(declaringClass)
-                    .serviceName(annotation.serviceId())
-                    .path(annotation.path())
-                    .build();
+            ThriftClientKey key = new ThriftClientKey();
+            key.setClazz(declaringClass);
+            key.setServiceName(annotation.serviceId());
+            key.setPath(annotation.path());
 
             try {
                 thriftClient = thriftClientsPool.borrowObject(key);
                 return ReflectionUtils.invokeMethod(methodInvocation.getMethod(), thriftClient, args);
             } catch (UndeclaredThrowableException e) {
-                if (TException.class.isAssignableFrom(e.getUndeclaredThrowable().getClass()))
-                    throw (TException)e.getUndeclaredThrowable();
+                if (TException.class.isAssignableFrom(e.getUndeclaredThrowable().getClass())) {
+                    throw (TException) e.getUndeclaredThrowable();
+                }
                 throw e;
             } finally {
-                if (null != thriftClient)
+                if (null != thriftClient) {
                     thriftClientsPool.returnObject(key, thriftClient);
+                }
             }
         });
     }

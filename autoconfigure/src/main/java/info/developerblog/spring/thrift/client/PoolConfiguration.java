@@ -66,14 +66,15 @@ public class PoolConfiguration {
     }
 
     private KeyedPooledObjectFactory<ThriftClientKey, TServiceClient> thriftClientPoolFactory() {
-        return ThriftClientPooledObjectFactory
-                .builder()
-                .protocolFactory(protocolFactory)
-                .propertyResolver(propertyResolver)
-                .loadBalancerClient(loadBalancerClient)
-                .tracing(tracing)
-                .tracer(tracer)
-                .build();
+        ThriftClientPooledObjectFactory factory = new ThriftClientPooledObjectFactory();
+
+        factory.setProtocolFactory(protocolFactory);
+        factory.setPropertyResolver(propertyResolver);
+        factory.setLoadBalancerClient(loadBalancerClient);
+        factory.setTracing(tracing);
+        factory.setTracer(tracer);
+
+        return factory;
     }
 
 }

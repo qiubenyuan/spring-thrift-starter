@@ -1,16 +1,18 @@
 package ru.trylogic.spring.boot.thrift.aop;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.ThrowsAdvice;
 
 import java.lang.reflect.Method;
 
-@Slf4j
 public class LoggingThriftMethodInterceptor implements MethodBeforeAdvice, AfterReturningAdvice, ThrowsAdvice {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
     public void before(Method method, Object[] args, Object target) throws Throwable {

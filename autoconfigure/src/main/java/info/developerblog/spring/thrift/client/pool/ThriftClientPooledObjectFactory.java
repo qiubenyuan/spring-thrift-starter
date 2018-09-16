@@ -22,7 +22,6 @@ import org.springframework.core.env.PropertyResolver;
 /**
  * Created by aleksandr on 14.07.15.
  */
-@Builder
 public class ThriftClientPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftClientKey, TServiceClient> {
     public static final int DEFAULT_CONNECTION_TIMEOUT = 1000;
     public static final int DEFAULT_READ_TIMEOUT = 30000;
@@ -32,6 +31,46 @@ public class ThriftClientPooledObjectFactory extends BaseKeyedPooledObjectFactor
     private PropertyResolver propertyResolver;
     private Tracing tracing;
     private Tracer tracer;
+
+    public TProtocolFactory getProtocolFactory() {
+        return protocolFactory;
+    }
+
+    public void setProtocolFactory(TProtocolFactory protocolFactory) {
+        this.protocolFactory = protocolFactory;
+    }
+
+    public LoadBalancerClient getLoadBalancerClient() {
+        return loadBalancerClient;
+    }
+
+    public void setLoadBalancerClient(LoadBalancerClient loadBalancerClient) {
+        this.loadBalancerClient = loadBalancerClient;
+    }
+
+    public PropertyResolver getPropertyResolver() {
+        return propertyResolver;
+    }
+
+    public void setPropertyResolver(PropertyResolver propertyResolver) {
+        this.propertyResolver = propertyResolver;
+    }
+
+    public Tracing getTracing() {
+        return tracing;
+    }
+
+    public void setTracing(Tracing tracing) {
+        this.tracing = tracing;
+    }
+
+    public Tracer getTracer() {
+        return tracer;
+    }
+
+    public void setTracer(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     @Override
     public TServiceClient create(ThriftClientKey key) throws Exception {

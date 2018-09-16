@@ -15,6 +15,8 @@ public class TGreetingServiceHandler implements TGreetingService.Iface {
     public String greet(TName name) throws TException {
         StringBuilder result = new StringBuilder();
 
+        System.out.println("接收到了请求~~： " + name.getFirstName() + ", " + name.getSecondName() + ", " + name.getStatus());
+
         result.append("Hello ");
 
         if(name.isSetStatus()) {
